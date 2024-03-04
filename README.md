@@ -56,5 +56,8 @@ cmake --build .
 ```
 
 The executable should be located in the `Debug` folder in `build`.
+#### 5. Shaders
+The way shaders are usually included in opengl programs is surprisingly dumb. Until I find a better solution, the shaders folder must be copied into the direcotory containing the executable.
+
 
 
