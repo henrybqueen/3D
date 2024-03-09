@@ -51,8 +51,6 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
     GlobalContext* context = (GlobalContext*)glfwGetWindowUserPointer(window);
 
-    printf("%d\n", context->paused);
-
 
     if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE) {
 
@@ -82,7 +80,6 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     // if the game is not paused, then record movement key presses and releases
     if (!context->paused) {
 
-        printf("Hello\n");
 
         if (key >= 0 && key < 1024) {
             if (action == GLFW_PRESS) {

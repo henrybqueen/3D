@@ -19,11 +19,8 @@ void error_callback(int error, const char* description) {
 GLFWwindow* init(GlobalContext* context) {
 
 
-    int width = 800;
-    int height = 600;
     float dPos = 0.02f;
     float dOr = 0.001f;
-
 
     if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize GLFW\n");
@@ -34,9 +31,13 @@ GLFWwindow* init(GlobalContext* context) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Use core profile
     glfwWindowHint(GLFW_SAMPLES, 4); // Request 4x multisampling
-    
 
-    GLFWwindow* window = glfwCreateWindow(width, height, "App", NULL, NULL);
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    int width = mode->width;
+    int height = mode->height;
+
+    GLFWwindow* window = glfwCreateWindow(width, height, "App", monitor, NULL);
 
     if (!window) {
         fprintf(stderr, "Failed to create GLFW window\n");

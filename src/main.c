@@ -46,7 +46,7 @@ void main() {
     mesh.context.numUniforms = 2;
     mesh.context.uniforms = (Uniform*)malloc(2 * sizeof(Uniform));
 
-    mesh.context.shader = buildShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
+    mesh.context.shader = buildShaderProgram("../../shaders/vertex.glsl", "../../shaders/fragment.glsl");
     glUseProgram(mesh.context.shader);
 
 
