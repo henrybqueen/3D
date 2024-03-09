@@ -8,7 +8,7 @@
 
 float* readBin(const char* path, size_t* num);
 char* readFile(const char* filePath);
-GLuint buildShaderProgram(const char* vertexPath, const char* fragmentPath);
+GLuint buildShaderProgram(const char* vertexPath, const char* geometryPath, const char* fragmentPath);
 void addElement(void** array, size_t* currentSize, void* newElement, size_t elementSize);
 void removeElement(void** array, size_t* currentSize, size_t indexToRemove, size_t elementSize);
 

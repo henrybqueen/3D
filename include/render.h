@@ -4,39 +4,36 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <cglm/cglm.h>
+#include <stddef.h> // for size_t
 
-// Enumeration for supported uniform types
+// Definition of UniformType enum
 typedef enum {
     UNI_FLOAT,
     UNI_VEC3,
     UNI_MAT4,
 } UniformType;
 
-// Structure to represent a shader uniform
+// Definition of Uniform struct
 typedef struct {
     void* pointer;
     GLint location;
     UniformType type;
 } Uniform;
 
-// Structure for rendering context
+// Definition of ShaderContext struct
 typedef struct {
-    GLuint vao, vbo, ebo;
     GLuint shader;
     Uniform* uniforms;
     size_t numUniforms;
-} RenderContext;
+} ShaderContext;
 
-// Function to set a specific uniform
+// Declaration of setUniform function
 void setUniform(Uniform* uniform);
 
-// Function to set all uniforms in a context
-void setUniforms(RenderContext* context);
+// Declaration of setUniforms function
+void setUniforms(ShaderContext* context);
 
-// Function to initialize the rendering context
-RenderContext initRenderContext(void);
-
-// Function to clean up the rendering context
-void cleanupRenderContext(RenderContext* context);
+// Declaration of initBuffers function
+void initBuffers(GLuint* vao, GLuint* vbo, GLuint* ebo);
 
 #endif // RENDER_H

@@ -17,11 +17,10 @@ typedef struct {
 } Uniform;
 
 typedef struct {
-    GLuint vao, vbo, ebo;
     GLuint shader;
     Uniform* uniforms;
     size_t numUniforms;
-} RenderContext;
+} ShaderContext;
 
 
 void setUniform(Uniform* uniform) {
@@ -38,7 +37,7 @@ void setUniform(Uniform* uniform) {
     }
 }
 
-void setUniforms(RenderContext* context) {
+void setUniforms(ShaderContext* context) {
 
     glUseProgram(context->shader); // Activate the shader program
 
@@ -47,53 +46,23 @@ void setUniforms(RenderContext* context) {
     }
 }
 
-RenderContext initRenderContext(void) {
+void initBuffers(GLuint* vao, GLuint* vbo, GLuint* ebo) {
 
-    RenderContext context = {
-        .vao = 0,
-        .vbo = 0,
-        .ebo = 0,
-        .shader = 0, 
-        .uniforms = NULL,
-        .numUniforms = 0
-    };
+    glGenVertexArrays(1, vao);
+    glBindVertexArray(*vao);
 
-    glGenVertexArrays(1, &context.vao);
-    glBindVertexArray(context.vao);
+    glGenBuffers(1, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, *vbo);
 
-    glGenBuffers(1, &context.vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, context.vbo);
+    if (ebo) {
+        glGenBuffers(1, ebo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *ebo);
+    }
 
-    glGenBuffers(1, &context.ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, context.ebo);
+    glBindVertexArray(0);
 
-    return context;
 }
 
-/* this function only worries about deleting the resources that intiRenderContext creates */
-void cleanupRenderContext(RenderContext* context) {
-
-    if (context == NULL) {
-        return;
-    }
-
-    // Delete OpenGL resources
-    if (context->vao) {
-        glDeleteVertexArrays(1, &context->vao);
-        context->vao = 0; // Reset to 0 to indicate it's been deleted
-    }
-
-    if (context->vbo) {
-        glDeleteBuffers(1, &context->vbo);
-        context->vbo = 0; // Reset to 0
-    }
-
-    if (context->ebo) {
-        glDeleteBuffers(1, &context->ebo);
-        context->ebo = 0; // Reset to 0
-    }
-
-}
 
 
 

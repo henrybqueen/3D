@@ -89,54 +89,60 @@ char* readFile(const char* filePath) {
     return buffer;
 }
 
-GLuint buildShaderProgram(const char* vertexPath, const char* fragmentPath) {
+GLuint buildShader(const char* path, GLenum type) {
 
-    // Load shader source code
-    char* vertexShaderSource = readFile(vertexPath);
-    char* fragmentShaderSource = readFile(fragmentPath);
+    char* source = readFile(path);
 
-    // Create shader objects
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    GLuint shader = glCreateShader(type);
+    glShaderSource(shader, 1, (const GLchar* const*)&source, NULL);
 
-    // Set shader source
-    glShaderSource(vertexShader, 1, (const GLchar* const*)&vertexShaderSource, NULL);
-    glShaderSource(fragmentShader, 1, (const GLchar* const*)&fragmentShaderSource, NULL);
-
-    // Compile shaders
-    glCompileShader(vertexShader);
-    glCompileShader(fragmentShader);
+    glCompileShader(shader);
 
     // Check for shader compile errors
     GLint success;
     GLchar infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog);
+        glGetShaderInfoLog(shader, 512, NULL, infoLog);
+        printf("ERROR::SHADER::COMPILATION_FAILED\n%s\n", infoLog);
     }
 
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog);
-    }
+    // free the source memory
+    free(source);
 
-    // Free the shader source memory
-    free(vertexShaderSource);
-    free(fragmentShaderSource);
+    return shader;
+
+
+}
+
+GLuint buildShaderProgram(const char* vertexPath, const char* geometryPath, const char* fragmentPath) {
+
+    GLuint vertexShader = buildShader(vertexPath, GL_VERTEX_SHADER);
+    GLuint fragmentShader = buildShader(fragmentPath, GL_FRAGMENT_SHADER);
+    GLuint geometryShader = 0;
+
+    if (geometryPath) {
+        geometryShader = buildShader(geometryPath, GL_GEOMETRY_SHADER);
+    }
 
     // Create shader program
     GLuint shaderProgram = glCreateProgram();
 
     // Attach shaders
     glAttachShader(shaderProgram, vertexShader);
+
+    if (geometryPath) {
+        glAttachShader(shaderProgram, geometryShader);
+    }
+
     glAttachShader(shaderProgram, fragmentShader);
 
     // Link the shader program
     glLinkProgram(shaderProgram);
 
     // Check for linking errors
+    GLint success;
+    GLchar infoLog[512];
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
@@ -148,6 +154,11 @@ GLuint buildShaderProgram(const char* vertexPath, const char* fragmentPath) {
     glDetachShader(shaderProgram, fragmentShader);
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+
+    if (geometryPath) {
+        glDetachShader(shaderProgram, geometryShader);
+        glDeleteShader(geometryShader);
+    }
 
     return shaderProgram;
 }

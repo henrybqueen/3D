@@ -101,11 +101,6 @@ void updatePos(Ray* ray, bool* keys) {
         return;
     }
 
-
-    if (keys[GLFW_KEY_W]) {
-        printf("W\n");
-    }
-
     float yaw = ray->or[0];
     float pitch = ray->or[1];
 

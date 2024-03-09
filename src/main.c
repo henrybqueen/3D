@@ -8,13 +8,9 @@
 #include "../include/ray.h"
 #include "../include/global.h"
 
+
+
 void main() {
-
-    int width = 800;
-    int height = 600;
-
-    float dPos = 0.1f;
-    float dOr = 0.1f;
 
     GlobalContext context;
     GLFWwindow* window = init(&context);
@@ -23,52 +19,39 @@ void main() {
     glm_perspective(glm_rad(45.0f), context.aspect, 0.1f, 100.0f, proj);
 
 
-    Mesh mesh = initMesh();
+    GLuint vao, vbo;
 
-    vec3 points[] = {
-        {-1.0f, 0.0f, 0.0f}, 
-        {-1.0f, 0.0f, -1.0f},
-        {1.0f, 0.0f, -1.0f},
-        {0.0f, 1.0f, -1.0f}
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    float points[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f
     };
 
-    Face triangles[] = {
-        {.vertices={0, 1, 2}},
-        {.vertices={0, 2, 3}},
-        {.vertices={0, 1, 3}},
-        {.vertices={1, 2, 3}},
-    };
 
-    buildMesh(&mesh, points, triangles, 4, 4);
-
-    loadBuffers(&mesh);
-
-    mesh.context.numUniforms = 2;
-    mesh.context.uniforms = (Uniform*)malloc(2 * sizeof(Uniform));
-
-    mesh.context.shader = buildShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
-    glUseProgram(mesh.context.shader);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
 
-    Uniform projUniform = {
-        .pointer = &proj,
-        .location = glGetUniformLocation(mesh.context.shader, "proj"),
-        .type = UNI_MAT4
-    };
+    GLuint shader = buildShaderProgram("shaders/vertex.glsl", "shaders/geometry.glsl", "shaders/fragment.glsl");
+    glUseProgram(shader);
 
-    Uniform viewUniform = {
-        .pointer = &view,
-        .location = glGetUniformLocation(mesh.context.shader, "view"),
-        .type = UNI_MAT4
-    };
+    GLint projLoc = glGetUniformLocation(shader, "proj");
+    GLint viewLoc = glGetUniformLocation(shader, "view");
 
- 
-    mesh.context.uniforms[0] = projUniform;
 
-    mesh.context.uniforms[1] = viewUniform;
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, &(proj[0][0]));
+
 
 
     while (!glfwWindowShouldClose(window)) {
+
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -77,16 +60,19 @@ void main() {
 
 
         updatePos(&(context.camera), context.inputManager.keys);
-        //printf("%f %f %f\n", context.camera.pos[0], context.camera.pos[1], context.camera.pos[2]);
+
         getView(&(context.camera), &view);
 
         if (context.needsUpdate) {
             glm_perspective(glm_rad(45.0f), context.aspect, 0.1f, 100.0f, proj);
+            glUniformMatrix4fv(projLoc, 1, GL_FALSE, &(proj[0][0]));
             context.needsUpdate = false;
         }
 
-        drawMesh(GL_TRIANGLES, &mesh);
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &(view[0][0]));
 
+        glPointSize(10.0f);
+        glDrawArrays(GL_POINTS, 0, 3);
 
         /* ~~~~~~~~~~~~~~~~~ */
 
