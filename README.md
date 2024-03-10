@@ -17,6 +17,10 @@ These instructions will get you a copy of the project up and running on your loc
 
 Follow these steps to get your development env running:
 
+#### Prerequisites (Linux):
+
+This project depends on `libglu` which can be obtained via `sudo apt-get install libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev` (Ubuntu/Debian) or `sudo yum install mesa-libGLU-devel` (Fedora/RHEL).
+
 #### 0. Clone the Repository
 
 First, clone the repository to your local machine.
