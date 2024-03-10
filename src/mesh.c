@@ -154,23 +154,25 @@ void loadBuffers(Mesh* mesh) {
 
 void drawMesh(GLenum mode, Mesh* mesh, bool drawNormals) {
 
+    glEnable(GL_DEPTH_TEST);
+    glLineWidth(2.0f);
+    glPointSize(1.0f);
+
 
     glBindVertexArray(mesh->vao);
+
+
     glUseProgram(mesh->faceShader.shader);
-
-    glEnable(GL_DEPTH_TEST);
-
     setUniforms(&(mesh->faceShader));
- 
-    glLineWidth(2.0f);
     glDrawElements(mode, 3 * mesh->numFaces, GL_UNSIGNED_INT, NULL);
 
     /* optionally draw normals, which use the same vao */
     if (drawNormals) {
+
         glUseProgram(mesh->normalShader.shader);
         setUniforms(&(mesh->normalShader));
-        glPointSize(5.0f);
         glDrawArrays(GL_POINTS, 0, mesh->numVertices);
+        
     }
 
     glBindVertexArray(0);

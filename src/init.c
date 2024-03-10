@@ -60,6 +60,10 @@ GLFWwindow* init(GlobalContext* context) {
 
     glEnable(GL_MULTISAMPLE); // anti aliasing
 
+    /* enable transparency */
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
 
     /* set callbacks as defined in io.c */

@@ -93,7 +93,7 @@ void main() {
     glm_perspective(glm_rad(45.0f), context.aspect, 0.1f, 100.0f, proj);
 
     Mesh mesh = initMesh();
-    buildSquare(&mesh, 10.0f, 50);
+    buildSquare(&mesh, 10.0f, 100);
     loadBuffers(&mesh);
 
 
@@ -102,8 +102,8 @@ void main() {
     mesh.normalShader.uniforms = (Uniform*)malloc(2 * sizeof(Uniform));
 
     mesh.faceShader.shader = buildShaderProgram("../../shaders/faces/vertex.glsl", NULL, "../../shaders/faces/fragment.glsl");
-    mesh.faceShader.numUniforms = 2;
-    mesh.faceShader.uniforms = (Uniform*)malloc(2 * sizeof(Uniform));
+    mesh.faceShader.numUniforms = 3;
+    mesh.faceShader.uniforms = (Uniform*)malloc(3 * sizeof(Uniform));
 
 
     Uniform projUniform = {
@@ -118,6 +118,12 @@ void main() {
         .type = UNI_MAT4
     };
 
+    Uniform viewPosUniform = {
+        .pointer = &(context.camera.pos),
+        .location = NULL,
+        .type = UNI_VEC3
+    };
+
     // set uniforms for normal shader
     glUseProgram(mesh.normalShader.shader);
     projUniform.location = glGetUniformLocation(mesh.normalShader.shader, "proj");
@@ -130,9 +136,11 @@ void main() {
     glUseProgram(mesh.faceShader.shader);
     projUniform.location = glGetUniformLocation(mesh.faceShader.shader, "proj");
     viewUniform.location = glGetUniformLocation(mesh.faceShader.shader, "view");
+    viewPosUniform.location = glGetUniformLocation(mesh.faceShader.shader, "viewPos");
 
     mesh.faceShader.uniforms[0] = projUniform;
     mesh.faceShader.uniforms[1] = viewUniform;
+    mesh.faceShader.uniforms[2] = viewPosUniform;
 
  
 
