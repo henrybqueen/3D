@@ -3,7 +3,7 @@
 #include <cglm/cglm.h>
 
 #include "../include/utils.h"
-#include "../include/render.h"
+#include "../include/shader.h"
 
 
 // Structure to represent a vertex with a position and a normal
@@ -23,7 +23,9 @@ typedef struct {
     Face* faces;
     size_t numVertices;
     size_t numFaces;
-    RenderContext context;
+    ShaderContext faceShader;
+    ShaderContext normalShader;
+    GLuint vao, vbo, ebo;
 } Mesh;
 
 // Function to calculate the normal of a triangle given three vertices
@@ -31,7 +33,7 @@ void calculateNormal(vec3 v1, vec3 v2, vec3 v3, vec3 result) {
     vec3 edge1, edge2;
     glm_vec3_sub(v2, v1, edge1);
     glm_vec3_sub(v3, v1, edge2);
-    glm_vec3_cross(edge1, edge2, result);
+    glm_vec3_cross(edge2, edge1, result); // the order here matters a lot
     glm_vec3_normalize(result);
 }
 
@@ -45,9 +47,18 @@ Mesh initMesh(void) {
         .numFaces = 0
     };
 
-    mesh.context = initRenderContext();
+    mesh.faceShader = initShaderContext();
+    mesh.normalShader = initShaderContext();
 
-    glBindVertexArray(mesh.context.vao);
+    /* generate vao, vbo, and ebo */
+    glGenVertexArrays(1, &mesh.vao);
+    glBindVertexArray(mesh.vao);
+
+    glGenBuffers(1, &mesh.vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo);
+
+    glGenBuffers(1, &mesh.ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.ebo);
 
     // positioin attribute
     glVertexAttribPointer(
@@ -131,7 +142,7 @@ void buildMesh(Mesh* mesh, vec3* points, Face* triangles, size_t numVertices, si
 
 void loadBuffers(Mesh* mesh) {
 
-    glBindVertexArray(mesh->context.vao);
+    glBindVertexArray(mesh->vao);
 
     glBufferData(GL_ARRAY_BUFFER, mesh->numVertices * sizeof(Vertex), mesh->vertices, GL_STATIC_DRAW);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->numFaces * sizeof(Face), mesh->faces, GL_STATIC_DRAW);
@@ -141,33 +152,27 @@ void loadBuffers(Mesh* mesh) {
 }
 
 
-void drawMesh(GLenum mode, Mesh* mesh) {
+void drawMesh(GLenum mode, Mesh* mesh, bool drawNormals) {
 
 
-    glBindVertexArray(mesh->context.vao);
-    glUseProgram(mesh->context.shader);
+    glBindVertexArray(mesh->vao);
+    glUseProgram(mesh->faceShader.shader);
 
     glEnable(GL_DEPTH_TEST);
 
-    setUniforms(&(mesh->context));
+    setUniforms(&(mesh->faceShader));
  
     glLineWidth(2.0f);
     glDrawElements(mode, 3 * mesh->numFaces, GL_UNSIGNED_INT, NULL);
 
+    /* optionally draw normals, which use the same vao */
+    if (drawNormals) {
+        glUseProgram(mesh->normalShader.shader);
+        setUniforms(&(mesh->normalShader));
+        glPointSize(5.0f);
+        glDrawArrays(GL_POINTS, 0, mesh->numVertices);
+    }
+
     glBindVertexArray(0);
 
-}
-
-void cleanupMesh(Mesh* mesh) {
-
-    if (mesh->vertices) {
-        free(mesh->vertices);
-        mesh->vertices = NULL;
-    }
-    if (mesh->faces) {
-        free(mesh->faces);
-        mesh->faces = NULL;
-    }
-
-    cleanupRenderContext(&(mesh->context));
 }
