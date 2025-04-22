@@ -3,7 +3,7 @@
 
 ![Screenshot (31)](https://github.com/user-attachments/assets/6b1ef975-ab08-493a-b0f5-0b0448cd228b)
 
-A rendering of the graph of f(x, y) = sin(x) * cos(y) including surface normals. 
+Graph of $f(x, y) = sin(x) * cos(y)$ including surface normals. 
 
 ## Getting Started
 
