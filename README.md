@@ -1,9 +1,12 @@
 
 # Henry's 3D Engine
 
-A collection of etudes in the art of 3D rendering.
+![Screenshot (31)](https://github.com/user-attachments/assets/6b1ef975-ab08-493a-b0f5-0b0448cd228b)
+
+A rendering of the graph of f(x, y) = sin(x) * cos(y) including surface normals. 
 
 ## Getting Started
+
 
 These instructions will get you a copy of the project up and running on your local machine. 
 
